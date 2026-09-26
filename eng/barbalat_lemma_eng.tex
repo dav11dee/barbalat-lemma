@@ -1,0 +1,563 @@
+\documentclass[a4paper,12pt]{article}
+
+% Pacchetti fondamentali
+\usepackage[T1]{fontenc}    % Codifica font (inputenc utf8 è predefinito dal 2018)
+%\usepackage[italian]{babel} % Lingua italiana
+\usepackage[english]{babel} % Lingua inglese
+\usepackage{import}
+% Colori (deve essere prima di pacchetti basati su tikz per evitare option clash)
+\usepackage[table]{xcolor}  % Per colorare tabelle e testo
+
+% Pacchetti matematici
+\usepackage{mathtools}      % Pacchetto matematico essenziale (carica amsmath)
+\usepackage{cancel}         % Per barrare termini nelle formule
+% \usepackage{amssymb}        % Simboli matematici aggiuntivi (spesso in conflitto con newtxmath)
+
+% Font e Teoremi
+\usepackage{newtxtext}                     % Font Times per il testo
+\usepackage{mleftright}                    % Per \mleft e \mright che funzionano bene con newtxmath
+\usepackage{amsthm}         % Per teoremi e dimostrazioni (caricato prima di newtxmath per evitare conflitti con \openbox)
+%\usepackage{newtxtext, newtxmath} % Font Times per testo e matematica
+\usepackage[subscriptcorrection,slantedGreek,nofontinfo,
+            eucal,   % \mathcal Euler Script
+            eufrak,  % \mathfrak Euler Fraktur
+            mtpscr,  % \mathscr Times-compatible (con lettere alternative)
+            mtphrb,  % \mathbb Holey Roman Bold
+            ]{mtpro2}
+% \usepackage[upint]{newtxmath}              % Base matematica Times
+% \usepackage[nonpxmath,scale=0.95]{eulerpx} % Lettere matematiche in AMS Euler scalate perfettamente
+% \usepackage{libertine, libertinust1math}      % Font Linertine per testo e matematica
+
+\usepackage{interval}
+% Se preferisci le parentesi tonde (a, b) invece delle quadre rovesciate ]a, b[ per gli aperti, decommenta la riga sotto:
+\intervalconfig{soft open fences}
+
+\usepackage[spaced=-1]{diffcoeff} % Per differenziali e derivate con notazione intelligente
+
+% Comandi per differenziali 
+\difdef { l } { dn } { style = d^ } % Per differenziali di ordine superiore (es. d^2 x)
+\NewDocumentCommand \dn { m m } { \dl.dn.[#1] #2 }
+
+\difdef { l } { p }
+{ op-symbol = \partial } % Per “differenziali parziali”
+\NewDocumentCommand \dlp {} { \dl.p. }
+
+% Comandi per Jacobiani
+\difdef { j } { / } { style = / } % Per Jacobiani in line 
+
+% Comandi per la valutazione di derivate in un punto specifico
+\difdef { f, fp, s, sp } { | }
+{
+outer-Ldelim
+= \left . ,
+outer-Rdelim = \right |,
+sub-nudge
+= 0 mu
+}
+\difdef { f, fp, s, sp } { ] }
+{
+outer-Ldelim = \left [ ,
+outer-Rdelim = \right ],
+elbowroom = 1 mu,
+sub-nudge = 0 mu
+}
+
+% Riduzione dello spazio prima della funzione (es. per f(x))
+\difdef { f, fp } {} 
+{
+  derivand-sep = 2 mu plus 1 mu minus 1 mu % default era 3 mu
+}
+
+% 2. Riduzione dello spazio per le derivate in linea (slash fraction)
+\difdef { s, sp } {} 
+{
+  derivand-sep = 1.3 mu plus 0.5 mu minus 0.5 mu % default era 2 mu
+} 
+
+% ==============================================================================
+% ALFABETI CALLIGRAFICI
+% ==============================================================================
+% \mathcal è Euler Script (opzione eucal)
+% \mathscr è Math Script (opzione mtpscr) con supporto ad \altC, \altG, ecc.
+
+% Curly Font (Times-compatible upright script)
+% Utilizziamo il wrapper interno \MTPsetupCurly per far funzionare le lettere 
+% alternative specifiche per Curly (\altG, \altM, \altN, \altQ, \altY).
+\DeclareRobustCommand*{\mathcurly}[1]{{\MTPsetupCurly\MTPCurly{#1}}}
+% Nota: non definiamo \mathbcurly perché il font Curly non ha una variante grassetto.
+
+% Computer Modern Calligraphic (il classico di default di LaTeX)
+\DeclareMathAlphabet{\mathcmcal}{OMS}{cmsy}{m}{n}
+\SetMathAlphabet{\mathcmcal}{bold}{OMS}{cmsy}{b}{n}
+\DeclareMathAlphabet{\mathbcmcal}{OMS}{cmsy}{b}{n}
+
+% ==============================================================================
+% ALFABETI FRAKTUR
+% ==============================================================================
+% MathTime Professional Fraktur
+% Utilizziamo il wrapper interno per far funzionare \altx, \alty e \altY
+\DeclareRobustCommand*{\mathmtfrak}[1]{{\MTPsetupFrak\MTPFrak{#1}}}
+
+
+% ==============================================================================
+% ALFABETI BLACKBOARD BOLD (DOPPIO TRATTO)
+% ==============================================================================
+% \mathbb è Holey Roman Bold (opzione mtphrb)
+
+% Holey Roman Bold Italic (Strutture generiche: K, A...)
+\DeclareMathAlphabet{\mathbbi}{U}{mt2hrb}{m}{it}
+
+% Holey Roman Bold Dark (Per versori i, j, k)
+\DeclareMathAlphabet{\mathbbd}{U}{mt2hrb}{b}{n}
+
+% MathTime Blackboard Bold (Dritto, pieno)
+\DeclareMathAlphabet{\mathmtbb}{U}{mt2bb}{m}{n}
+
+% MathTime Blackboard Bold Italic (Corsivo, pieno)
+\DeclareMathAlphabet{\mathmtbbi}{U}{mt2bb}{m}{it}
+
+% MathTime Blackboard Bold Dark (Grassetto, pieno)
+\DeclareMathAlphabet{\mathmtbbd}{U}{mt2bb}{b}{n}
+
+% Altri pacchetti
+% \usepackage{thmtools}      % Per teoremi e dimostrazioni (alternativa ad amsthm)
+\usepackage{enumitem}       % Per personalizzare gli elenchi
+\usepackage{multirow}       % Per celle che si estendono su più righe
+\usepackage{relsize}        % Per cambiare la dimensione del testo in modo relativo
+\usepackage[b]{esvect}      % Per vettori con freccia più elegante
+\usepackage{ifthen}         % PER I COMANDI CON LOGICA CONDIZIONALE
+\usepackage{tikz-cd}        % Per diagrammi commutativi
+\usepackage{graphicx}       % Per includere immagini
+\usepackage{fancyvrb}       % Per ambienti verbatim non standard
+\usepackage{fvextra}        % Estensioni per verbatim (es. \SaveVerb, \UseVerb)
+\usepackage[Glenn]{fncychap}% Per capitoli con stile personalizzato 
+%Options: Sonny, Lenny, Glenn, Conny, Rejne, Bjarne, Bjornstrup
+
+\usepackage{geometry}       % Per gestire i margini
+\geometry{a4paper, margin=2.5cm}
+
+% setup intestazioni e piè di pagina
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{} % Pulisce tutti gli header e footer
+\setlength{\headwidth}{\textwidth} % Larghezza header uguale a textwidth/linewidth
+\fancyhead[LE,RO]{\thepage} % Numeri di pagina ai lati esterni
+\fancyhead[RE]{\nouppercase{\leftmark}} % Nome capitolo a sinistra nelle pagine pari
+\fancyhead[LO]{\nouppercase{\rightmark}} % Nome sezione a destra nelle pagine dispari
+\renewcommand{\headrulewidth}{0.4pt} % Linea sotto l'header
+\renewcommand{\footrulewidth}{0pt} % Nessuna linea nel footer
+
+% hyperref per link e riferimenti
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={Lemma di Barbalat},
+    pdfauthor={Davide De Marco},
+    pdfsubject={},
+    pdfkeywords={Lemma di Barbalat, Stabilità, Teoria del Controllo, Lyapunov, Continuità Uniforme, derivate, convergenza},
+}
+
+% Comando intelligente per costanti matematiche
+\ExplSyntaxOn
+\NewDocumentCommand{\upconst}{m}
+ {
+  % Controlla se il numero di caratteri dell'input (#1) è esattamente 1
+  \int_compare:nNnTF { \str_count:n { #1 } } = { 1 }
+   { \mathrm { #1 } }    % [Vero] 1 carattere: applica \mathrm
+   { \use:c { up #1 } }  % [Falso] >1 caratteri: equivalente a \csname up#1\endcsname
+ }
+\ExplSyntaxOff
+
+% Costanti matematiche e versori
+\newcommand{\eu}{\upconst{e}}           % Costante di Nepero
+\newcommand{\iu}{\upconst{i}}           % Unità immaginaria
+\newcommand{\piu}{\upconst{pi}}               % Pi greco
+\newcommand{\vsi}{\mathbbd{i}}     % Versore asse x
+\newcommand{\vsj}{\mathbbd{j}}     % Versore asse y
+\newcommand{\vsk}{\mathbbd{k}}          % Versore asse z
+
+% --- Definizioni Matematiche Personalizzate ---
+\newcommand{\K}{\mathbbi{K}}             % Campo K
+
+% Operatori
+\DeclareMathOperator{\rk}{rk}           % Rango
+\DeclareMathOperator{\Sol}{Sol}         % Spazio delle Soluzioni
+\DeclareMathOperator{\GL}{GL}           % Gruppo Lineare Generale
+\DeclareMathOperator{\Imm}{im}          % Insieme immagine
+\DeclareMathOperator{\Span}{span}       % Span
+\DeclareMathOperator{\Spanbis}{\mathscr{\altL}} % Span alternativo con L calligrafica
+\DeclareMathOperator{\Cof}{cof}         % Cofattore
+\DeclareMathOperator{\Adj}{adj}         % Matrice aggiunta (adjugate)
+
+% Operatori differenziali
+\newcommand{\grad}{\nabla\!} % Gradiente con spazio negativo per avvicinarlo alla funzione
+\newcommand{\diverg}{\nabla \cdot}
+\newcommand{\rot}{\nabla \times}
+\newcommand{\lapl}{\nabla^2} % Oppure \Delta
+
+% Matrici speciali
+\newcommand{\Id}{\mathbbd{1}}           % Matrice Identità (blackboard bold)
+
+%classe C di funzioni
+\newcommand{\classC}[1]{\mathscr{\altC}^{#1}} % Classe C^k di funzioni
+
+% Spazio delle Matrici "Intelligente"
+% Sintassi: \Mat{righe}{colonne}{campo}
+\newcommand{\Mat}[3]{%
+    \ifthenelse{\equal{#1}{#2}}         % Controlla se righe=colonne
+        {\mathscr{M}_{#1}(#3)}          % Se righe=colonne
+        {\mathscr{M}_{#1,#2}(#3)}       % Se righe!=colonne
+}
+
+% Trasposta, Vettori e Matrici
+\newcommand{\vect}[1]{\mathbold{#1}}   % Vettore 
+\newcommand{\rvect}[1]{\vv{#1}} % Raggio vettore con freccia
+\newcommand{\tr}{^{\normalfont\textsf{\relsize{-1}T}}}               % Trasposta
+\newcommand{\matr}[1]{\mathbold{#1}} % Matrice (grassetto)
+
+% Barra di separazione otticamente alleggerita per matrici a blocchi
+\newcommand{\middledivbar}{\;\color{black!46}\middle|\color{black}\;} % Per matrici a blocchi adattabile
+\newcommand{\bigdivbar}{\;\color{black!46}\big|\color{black}\;} % Per matrici a blocchi grandi
+\newcommand{\Bigdivbar}{\;\color{black!46}\Big|\color{black}\;} % Per matrici a blocchi ancora più grandi
+
+% --- NOTAZIONI MATRICIALI ---
+
+% Cofattore di una matrice (con i,j come indici)
+\newcommand{\cof}[3]{\Cof_{#1,#2}\mleft( \matr{#3} \mright)}
+
+% 1. Elemento di posto i,j (Opzionale: potresti anche scriverlo a mano essendo molto semplice)
+% Uso: \entry{A}{ij} oppure \entry{A}{i,j}
+% \newcommand{\entry}[2]{#1_{#2}}
+
+% 2. Riga di una matrice
+% Uso: \matrow{A}{i}
+\newcommand{\matrow}[2]{\matr{#1}_{(#2)}}
+
+% 3. Colonna di una matrice
+% Uso: \matcol{A}{j}
+\newcommand{\matcol}[2]{\matr{#1}^{(#2)}}
+% 4. Sottomatrice generale (estrazione di righe I e colonne J)
+% Uso: \submat{A}{I}{J}
+% Uso: \submat{A}{i_1,i_2,...,i_k}{j_1,j_2,...,j_l}
+\newcommand{\submat}[3]{\matr{#1}_{(#2)}^{(#3)}}
+
+% 5. Sottomatrice con riga i e colonna j eliminate (taglio)
+% Uso: \subdel{A}{i}{j}
+\newcommand{\subdel}[3]{\matr{#1}_{(#2 \mid #3)}}
+
+\newcommand{\matrowsysm}[1]{\mathscr{R}_{\matr{#1}}} % Simbolo per il sistema di righe di una matrice
+\newcommand{\matcolsysm}[1]{\mathscr{\altC}_{\matr{#1}}} % Simbolo per il sistema di colonne di una matrice
+\newcommand{\req}{%
+    \overset{%
+      \text{%
+        \raisebox{-0.4ex}[1ex][0ex]{\relsize{-2}$\mathscr{R}$}%
+        }%
+        }{\equiv}} % Riga-equivalenza con R sopra
+
+% Insieme vuoto 
+% \renewcommand{\emptyset}{\varnothing}   % Simbolo di insieme vuoto più elegante
+
+\newcommand{\thmcita}[1]{\textsc{#1}} % Per citare teoremi con il nome in maiuscoletto
+
+
+% Definizione di un array per matrici a blocchi con linee grigie
+\newenvironment{blockarray}[1]
+  {%
+   \arrayrulecolor{black!46}% Colora le linee di grigio
+   \begin{array}{#1}%
+  }
+  {%
+   \end{array}%
+   \arrayrulecolor{black}% Ripristina il nero per non intaccare tabelle future
+  }
+
+% Comandi per le operazioni elementari sulle righe
+\newcounter{descrOP} % 1. Definisci il contatore
+
+\makeatletter
+\renewcommand{\p@descrOP}[1]{\normalfont OP\textsubscript{#1}}
+\makeatother
+
+% 2. Crea un comando personalizzato per l'item
+\newcommand{\itemOp}{%
+  \refstepcounter{descrOP}% Incrementa il contatore e permette a \label di vederlo
+  \item[(OP\textsubscript{\thedescrOP})]% Stampa il numero seguito dal testo dell'opzione
+}
+
+\newcounter{descrDet} % 1. Definisci il contatore
+
+\makeatletter
+\renewcommand{\p@descrDet}[1]{\normalfont D\textsubscript{#1}}
+\makeatother
+
+\newcommand{\itemDet}{%
+  \refstepcounter{descrDet}% Incrementa il contatore e permette a \label di vederlo
+  \item[(D\textsubscript{\thedescrDet})]% Stampa il numero seguito dal testo dell'opzione
+}
+
+% Simbolo di somma con grandezza adattabile al contesto (funziona male con TX)
+\makeatletter
+\newcommand{\bigplus}{%
+  \DOTSB\mathop{\mathpalette\mattos@bigplus\relax}\slimits@
+}
+\newcommand\mattos@bigplus[2]{%
+  \vcenter{\hbox{%
+    \sbox\z@{$#1\sum$}%
+    \resizebox{!}{0.9\dimexpr\ht\z@+\dp\z@}{\raisebox{\depth}{$\m@th#1+$}}%
+  }}%
+  \vphantom{\sum}%
+}
+\makeatother
+
+% --- Ambienti Teorema ---
+\newtheoremstyle{normaltheorem}% Nome dello stile
+    {3pt}% Space above
+    {3pt}% Space below
+    {\itshape}% Body font
+    {}% Indent amount
+    {\bfseries\scshape}% Theorem head font
+    {.}% Punctuation after theorem head
+    {.5em}% Space after theorem head
+    {\thmname{#1}\thmnumber{ #2}\thmnote{ \normalfont\bfseries(#3)}}% Theorem head spec (can be left empty, meaning ‘normal’)
+\theoremstyle{normaltheorem} % Stile corsivo per i teoremi (default)
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollario}
+\newtheorem{proposition}[theorem]{Proposizione}
+
+\newtheoremstyle{nametheorem}% Nome dello stile
+    {3pt}% Space above
+    {3pt}% Space below
+    {\itshape}% Body font
+    {}% Indent amount
+    {\bfseries\scshape}% Theorem head font
+    {.}% Punctuation after theorem head
+    {.5em}% Space after theorem head
+    {\thmname{#1}\thmnote{ #3}\thmnumber{ #2}}% Theorem head spec (can be left empty, meaning ‘normal’)
+\theoremstyle{nametheorem}
+\newtheorem{nametheorem}[theorem]{Teorema}
+\newtheorem{namelemma}[theorem]{Lemma}
+
+\makeatletter
+\renewenvironment{proof}[1][\proofname]{\par
+  \pushQED{\qed}%
+  \normalfont \topsep6\p@\@plus6\p@\relax
+  \trivlist
+  \item\relax
+  {\scshape
+    #1\@addpunct{.}}\hspace\labelsep\ignorespaces
+  }{%
+    \popQED\endtrivlist\@endpefalse
+  }
+\makeatother
+
+%\theoremstyle{definition} % Stile tondo per le definizioni
+%\newtheorem*{definizione}{\normalfont\textsc{Definizione}}%[section]
+\newtheoremstyle{definition_style}% Nome dello stile
+    {3pt}% Space above
+    {3pt}% Space below
+    {}% Body font
+    {}% Indent amount
+    {\bfseries\scshape}% Theorem head font
+    {.}% Punctuation after theorem head
+    {.5em}% Space after theorem head
+    {}% Theorem head spec (can be left empty, meaning ‘normal’)
+\theoremstyle{definition_style}
+\newtheorem{definition}{Definizione}[section]
+
+\newtheoremstyle{notation_style}% Nome dello stile
+    {3pt}% Space above
+    {3pt}% Space below
+    {}% Body font
+    {}% Indent amount
+    {\bfseries\scshape}% Theorem head font
+    {.}% Punctuation after theorem head
+    {.5em}% Space after theorem head
+    {}% Theorem head spec (can be left empty, meaning ‘normal’)
+\theoremstyle{notation_style}
+\newtheorem{notation}[definition]{Notazione}
+
+\newtheoremstyle{example_style}% Nome dello stile
+    {3pt}% Space above
+    {3pt}% Space below
+    {}% Body font
+    {}% Indent amount
+    {\bfseries\scshape}% Theorem head font
+    {.}% Punctuation after theorem head
+    {.5em}% Space after theorem head
+    {}% Theorem head spec (can be left empty, meaning ‘normal’)
+\theoremstyle{example_style}
+\newtheorem{example}{Esempio}[section]
+
+
+\theoremstyle{remark} % Stile per le osservazioni
+\newtheorem*{remark}{Osservazione}%[section]
+\newtheorem*{property}{Proprietà}%[section]
+
+%\setlist[description]{font=\normalfont\itshape, style=nextline}
+
+
+\title{%
+  \textbf{Lemma di Barbalat}\\
+  %\rule[-1cm]{0pt}{1cm} % linea vuota per spaziatura
+}
+\author{%
+  Davide De Marco
+  %\\{\relsize{-1}Bacoli, Italia}
+}
+\date{}
+
+\begin{document}
+\maketitle
+\section{Enunciato e dimostrazione del Lemma di Barbalat}
+\begin{namelemma}[di Barbalat]\label{lemma:barbalat}
+  Sia $f \, \colon \interval[open right]{0}{+\infty} \to \mathbb{R}$ una funzione tale che:
+  \begin{enumerate}[label=\upshape({\itshape\roman*}\kern 0.6pt), ref=({\itshape\roman*}\kern 0.6pt)]
+    \item $f \in \classC{1}\bigl(\interval[open right]{0}{+\infty}\bigr)$;
+    \item $\lim\limits_{t \to + \infty} f(t)$ esiste e vale $\mathscr{l} \in \mathbb{R}$;
+    \item $\dot{f}$ è uniformemente continua su $\interval[open right]{0}{+\infty}$.
+  \end{enumerate}
+  Allora, $\lim\limits_{t \to + \infty} \dot{f}(t) = 0$.
+\end{namelemma}
+
+\begin{proof}
+  Si supponga per assurdo che 
+  \[
+  \lim_{t \to +\infty} \dot{f}(t) \neq 0
+  \]
+  oppure che $\dot{f}$ non ammetta limite per $t \to +\infty$. In entrambi i casi, negando la definizione di limite, esiste una costante $\varepsilon > 0$ e una successione $\mleft\{ t_n \mright\}_{n \in \mathbb{N}}$ tale che:
+  \begin{equation}\label{eq:barbalat_contr}
+    \lim_{n \to +\infty}t_n = +\infty \quad \text{e} \quad \mleft|\dot{f}(t_n) \mright| > \varepsilon \quad \forall n \in \mathbb{N}.
+  \end{equation}
+  Poiché $\dot{f}$ è uniformemente continua, per ogni $\bar{\varepsilon} > 0$ esiste $\delta = \delta(\bar{\varepsilon}) > 0$ tale che
+  \begin{equation*}
+    \mleft| \dot{f}(t) - \dot{f}(t_n) \mright| < \bar{\varepsilon} \quad \forall t \in \interval[open]{t_n}{t_n + \delta}, \,\forall n \in \mathbb{N}.
+  \end{equation*}
+  Scegliendo $\bar{\varepsilon} = \varepsilon/2$ si ottiene la relazione
+  \begin{equation}\label{eq:barbalat_uc2}
+    \mleft| \dot{f}(t) - \dot{f}(t_n) \mright| < \frac{\varepsilon}{2} \quad \forall t \in \interval[open]{t_n}{t_n + \delta}, \,\forall n \in \mathbb{N}.
+  \end{equation}
+  Mediante la disuguaglianza triangolare si ricava la stima
+  \begin{equation*}
+    \mleft| \dot{f}(t_n) \mright| = \mleft|\dot{f}(t) - \dot{f}(t_n) - \dot{f}(t) \mright| \leq \mleft| \dot{f}(t) - \dot{f}(t_n) \mright| + \mleft| \dot{f}(t) \mright|
+  \end{equation*}
+  da cui segue necessariamente
+  \begin{equation}\label{eq:barbalat_triang2}
+    \mleft| \dot{f}(t) \mright| \geq \mleft| \dot{f}(t_n) \mright| - \mleft| \dot{f}(t) - \dot{f}(t_n) \mright| \quad \forall t \in \interval[open]{t_n}{t_n + \delta}, \,\forall n \in \mathbb{N}.
+  \end{equation}
+  Combinando \eqref{eq:barbalat_contr}, \eqref{eq:barbalat_uc2} e \eqref{eq:barbalat_triang2} si ottiene
+  \begin{equation*}
+    \mleft| \dot{f}(t) \mright| \geq \mleft| \dot{f}(t_n) \mright| - \mleft| \dot{f}(t) - \dot{f}(t_n) \mright| > \varepsilon - \frac{\varepsilon}{2} = \frac{\varepsilon}{2}
+  \end{equation*}
+  da cui segue che
+  \begin{equation}\label{eq:barbalat_contr3}
+    \mleft| \dot{f}(t) \mright| > \frac{\varepsilon}{2} \quad \forall t \in \interval[open]{t_n}{t_n + \delta}, \,\forall n \in \mathbb{N}.
+  \end{equation}
+  Per ipotesi, per ogni $n \in \mathbb{N}$, $f$ è continua su $\interval{t_n}{t_n + \delta}$ e derivabile su $\interval[open]{t_n}{t_n + \delta}$, dunque, per il \thmcita{Teorema di Lagrange} e la relazione \eqref{eq:barbalat_contr3}, esiste $\xi_n \in \interval[open]{t_n}{t_n + \delta}$ tale che
+  \begin{equation*}
+    \mleft|f(t_n + \delta) - f(t_n)\mright| = \mleft|\dot{f}(\xi_n) \cdot \delta \mright| = \mleft|\dot{f}(\xi_n)\mright| \delta > \frac{\varepsilon\delta}{2}
+  \end{equation*}
+  da cui segue che
+  \begin{equation}\label{eq:barbalat_contr4}
+    \mleft|f(t_n + \delta) - f(t_n)\mright| > \frac{\varepsilon\delta}{2} > 0 \quad \forall n \in \mathbb{N}.
+  \end{equation}
+  Per ipotesi
+  \[
+  \lim_{n \to +\infty} f(t_n + \delta) - f(t_n) = \mathscr{l} - \mathscr{l} = 0,
+  \]
+  applicando la definizione di limite:
+  \begin{equation*}
+    \forall \sigma > 0, \, \exists \nu \in \mathbb{N} \, \colon \, \mleft|f(t_n + \delta) - f(t_n)\mright| < \sigma \quad \forall n > \nu. 
+  \end{equation*}
+  Scegliendo $\sigma = \varepsilon\delta/2$ si ottiene la relazione
+  \begin{equation*}
+    \mleft|f(t_n + \delta) - f(t_n)\mright| < \frac{\varepsilon\delta}{2} \quad \forall n > \nu
+  \end{equation*}
+  che è in contraddizione con \eqref{eq:barbalat_contr4}. L'assurdo nasce dall'aver negato la tesi, dunque, necessariamente, 
+  \[
+  \lim_{t \to + \infty} \dot{f}(t) = 0.
+  \]
+\end{proof}
+
+\medskip
+Se la funzione $\dot{f}$ non è uniformemente continua, non c'è garanzia che la tesi del \thmcita{Lemma di Barbalat \ref{lemma:barbalat}} sia vera. Viene mostrato, di seguito, un controesempio a sostegno di questa affermazione.
+
+\section{Analisi del controesempio}
+\begin{example}
+Si consideri la funzione
+\begin{equation}
+    f(t) = \frac{\sin t^2}{t}
+\end{equation}
+definita su $\interval[open right]{0}{+\infty}$. Per il \thmcita{Teorema dei Carabinieri} si osserva subito che
+\begin{equation*}
+    \lim_{t \to +\infty} f(t) = 0 \,.
+\end{equation*}
+Calcolando la derivata prima si ottiene:
+\begin{equation*}
+    \dot{f}(t) = \diff*{\mleft(\frac{\sin t^2}{t}\mright)}{t} = \frac{2t \cos t^2 \cdot t - \sin t^2}{t^2} = 2\cos t^2 - \frac{\sin t^2}{t^2}
+\end{equation*}
+
+\smallskip
+Siano definite le seguenti successioni:
+\begin{equation*}
+    x_n = \SQRT{2n\pi}, \quad y_n = \SQRT{2n\pi + \frac{\pi}{2}} \,.
+\end{equation*}
+La successione definita come $x_n - y_n$ è della forma
+\begin{equation*}
+    x_n - y_n = \SQRT{2n\pi} - \SQRT{2n\pi + \frac{\pi}{2}} = \frac{-\frac{\pi}{2}}{\SQRT{2n\pi} + \SQRT{2n\pi + \frac{\pi}{2}}} \,,
+\end{equation*}
+da cui segue che
+\begin{equation}\label{eq:barbalat_contr5}
+    \lim_{n \to +\infty} \mleft| x_n - y_n \mright| = 0.
+\end{equation}
+Si osserva che, per ogni $n \in \mathbb{N}$, $\dot{f}$ valutata in $x_n$ vale
+\begin{equation*}
+    \dot{f}(x_n) = 2\cos(2n\pi) - \frac{\sin(2n\pi)}{2n\pi} = 2(1) - 0 = 2 \, ,
+\end{equation*}
+mentre, per ogni $n \in \mathbb{N}$, $\dot{f}$ valutata in $y_n$ vale
+\begin{equation*}
+    \dot{f}(y_n) = 2\cos\mleft(2n\pi + \frac{\pi}{2}\mright) - \frac{\sin\mleft(2n\pi + \frac{\pi}{2}\mright)}{2n\pi + \frac{\pi}{2}} = 2(0) - \frac{1}{2n\pi + \frac{\pi}{2}} = - \frac{1}{2n\pi + \frac{\pi}{2}} \,.
+\end{equation*}
+Dunque, 
+\begin{equation*}
+  \mleft| \dot{f}(x_n) - \dot{f}(y_n) \mright| > 2 \quad \forall n \in \mathbb{N}
+\end{equation*}
+e, in particolare,
+\begin{equation*}
+    \lim_{n \to +\infty} \mleft| \dot{f}(x_n) - \dot{f}(y_n) \mright| = \lim_{n \to +\infty} \mleft| 2 + \frac{1}{2n\pi + \frac{\pi}{2}} \mright| = 2 \,.
+\end{equation*}
+
+Si scelga $\varepsilon = 2 > 0$ e si fissi un arbitrario $\delta > 0$. 
+Dalla \eqref{eq:barbalat_contr5} segue che
+\begin{equation*}
+    \exists \nu \in \mathbb{N} \, \colon \, \mleft| x_n - y_n \mright| < \delta \quad \forall n > \nu.
+\end{equation*}
+Fissando un qualsiasi indice $\bar{n} > \nu$, si ottiene la relazione
+\begin{equation*}
+    \mleft| x_{\bar{n}} - y_{\bar{n}} \mright| < \delta.
+\end{equation*}
+Tuttavia, valutando la distanza tra le rispettive immagini, si osserva che
+\begin{equation*}
+    \mleft| \dot{f}(x_{\bar{n}}) - \dot{f}(y_{\bar{n}}) \mright| = 2 + \frac{1}{2\bar{n}\pi + \frac{\pi}{2}} > 2 = \varepsilon \,.
+\end{equation*}
+Si è così esibita una coppia di punti che, pur distando meno dell'arbitraria tolleranza $\delta$, possiedono immagini che distano strettamente più di $\varepsilon$. Essendo ciò costruttivamente valido per ogni possibile scelta di $\delta > 0$, la definizione di uniforme continuità per $\dot{f}$ risulta formalmente violata.
+
+\smallskip
+Infine, le medesime successioni $x_n$ e $y_n$ permettono di dimostrare in modo immediato che $\dot{f}$ non ammette limite per $t \to +\infty$. Si osserva banalmente che
+\begin{equation*}
+    \lim_{n \to +\infty} x_n = +\infty \quad \text{e} \quad \lim_{n \to +\infty} y_n = +\infty \,,
+\end{equation*}
+ma, passando al limite le rispettive immagini, si ottiene:
+\begin{align*}
+    \lim_{n \to +\infty} \dot{f}(x_n) &= \lim_{n \to +\infty} 2 = 2 \\
+    \lim_{n \to +\infty} \dot{f}(y_n) &= \lim_{n \to +\infty} \mleft( - \frac{1}{2n\pi + \frac{\pi}{2}} \mright) = 0 \,
+\end{align*}
+da cui si deduce necessariamente che
+\begin{equation*}
+    \nexists \lim_{t \to +\infty} \dot{f}(t) \,.
+\end{equation*}
+\end{example}
+\end{document}
