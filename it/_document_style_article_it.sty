@@ -1,0 +1,510 @@
+% AUTHOR: Agostino De Marco, agostino.demarco@unina.it
+% packages and related macros
+\ProvidesPackage{_document_style_article_it}[2024/06/10 v1.0 Document Style for Physics Notes]
+
+\usepackage[subpreambles=false]{standalone}
+\usepackage{import}
+
+% Pacchetti fondamentali
+\usepackage[T1]{fontenc}    % Codifica font (inputenc utf8 è predefinito dal 2018)
+\usepackage[italian]{babel} % Lingua italiana
+\usepackage{import}
+% Colori (deve essere prima di pacchetti basati su tikz per evitare option clash)
+\usepackage[table]{xcolor}  % Per colorare tabelle e testo
+
+
+
+% Pacchetti matematici
+\usepackage{mathtools}      % Pacchetto matematico essenziale (carica amsmath)
+\usepackage{cancel}         % Per barrare termini nelle formule
+% \usepackage{amssymb}        % Simboli matematici aggiuntivi (spesso in conflitto con newtxmath)
+
+% Font e Teoremi
+\usepackage{newtxtext}                     % Font Times per il testo
+\usepackage{mleftright}                    % Per \mleft e \mright che funzionano bene con newtxmath
+\usepackage{amsthm}         % Per teoremi e dimostrazioni (caricato prima di newtxmath per evitare conflitti con \openbox)
+% \usepackage{newtxtext, newtxmath} % Font Times per testo e matematica
+\usepackage[subscriptcorrection,slantedGreek,nofontinfo,
+            %eucal,   % \mathcal Euler Script
+            %eufrak,  % \mathfrak Euler Fraktur
+            mtpscr,  % \mathscr Times-compatible (con lettere alternative)
+            mtphrb,  % \mathbb Holey Roman Bold
+            ]{mtpro2}
+% \usepackage[upint]{newtxmath}              % Base matematica Times
+% \usepackage[nonpxmath,scale=0.95]{eulerpx} % Lettere matematiche in AMS Euler scalate perfettamente
+% \usepackage{libertine, libertinust1math}      % Font Linertine per testo e matematica
+
+\usepackage{bm}             % Per grassetto in matematica (es. \bm{\alpha})
+
+\usepackage{interval}
+% Se preferisci le parentesi tonde (a, b) invece delle quadre rovesciate ]a, b[ per gli aperti, decommenta la riga sotto:
+\intervalconfig{soft open fences}
+
+\usepackage[spaced=-1]{diffcoeff} % Per differenziali e derivate con notazione intelligente
+
+% Comandi per differenziali 
+\difdef { l } {} { outer-Ldelim = \! } % Per differenziali di primo ordine
+
+\difdef { l } { dn } { style = d^ } % Per differenziali di ordine superiore (es. d^2 x)
+\NewDocumentCommand \dn { m m } { \dl.dn.[#1] #2 }
+
+\difdef { l } { p }
+{ op-symbol = \partial } % Per “differenziali parziali”
+\NewDocumentCommand \dlp {} { \dl.p. }
+
+% Comandi per Jacobiani
+\difdef { j } { / } { style = / } % Per Jacobiani in line 
+
+% Comandi per la valutazione di derivate in un punto specifico
+\difdef { f, fp, s, sp } { | }
+{
+outer-Ldelim
+= \left . ,
+outer-Rdelim = \right |,
+sub-nudge
+= 0 mu
+}
+\difdef { f, fp, s, sp } { ] }
+{
+outer-Ldelim = \left [ ,
+outer-Rdelim = \right ],
+elbowroom = 1 mu,
+sub-nudge = 0 mu
+}
+
+% Riduzione dello spazio prima della funzione (es. per f(x))
+\difdef { f, fp } {} 
+{
+  derivand-sep = 2 mu plus 1 mu minus 1 mu % default era 3 mu
+}
+
+% 2. Riduzione dello spazio per le derivate in linea (slash fraction)
+\difdef { s, sp } {} 
+{
+  derivand-sep = 1.3 mu plus 0.5 mu minus 0.5 mu % default era 2 mu
+}
+
+% ==============================================================================
+% ALFABETI CALLIGRAFICI
+% ==============================================================================
+% \mathcal è Euler Script (opzione eucal)
+% \mathscr è Math Script (opzione mtpscr) con supporto ad \altC, \altG, ecc.
+
+% Curly Font (Times-compatible upright script)
+% Utilizziamo il wrapper interno \MTPsetupCurly per far funzionare le lettere 
+% alternative specifiche per Curly (\altG, \altM, \altN, \altQ, \altY).
+\DeclareRobustCommand*{\mathcurly}[1]{{\MTPsetupCurly\MTPCurly{#1}}}
+% Nota: non definiamo \mathbcurly perché il font Curly non ha una variante grassetto.
+
+% Computer Modern Calligraphic (il classico di default di LaTeX)
+% \DeclareMathAlphabet{\mathcmcal}{OMS}{cmsy}{m}{n}
+% \SetMathAlphabet{\mathcmcal}{bold}{OMS}{cmsy}{b}{n}
+% \DeclareMathAlphabet{\mathbcmcal}{OMS}{cmsy}{b}{n}
+
+% ==============================================================================
+% ALFABETI FRAKTUR
+% ==============================================================================
+% MathTime Professional Fraktur
+% Utilizziamo il wrapper interno per far funzionare \altx, \alty e \altY
+\DeclareRobustCommand*{\mathmtfrak}[1]{{\MTPsetupFrak\MTPFrak{#1}}}
+
+
+% ==============================================================================
+% ALFABETI BLACKBOARD BOLD (DOPPIO TRATTO)
+% ==============================================================================
+% \mathbb è Holey Roman Bold (opzione mtphrb)
+
+% Holey Roman Bold Italic (Strutture generiche: K, A...)
+\DeclareMathAlphabet{\mathbbi}{U}{mt2hrb}{m}{it}
+
+% Holey Roman Bold Dark (Per versori i, j, k)
+% \DeclareMathAlphabet{\mathbbd}{U}{mt2hrb}{b}{n}
+
+% MathTime Blackboard Bold (Dritto, pieno)
+% \DeclareMathAlphabet{\mathmtbb}{U}{mt2bb}{m}{n}
+
+% MathTime Blackboard Bold Italic (Corsivo, pieno)
+% \DeclareMathAlphabet{\mathmtbbi}{U}{mt2bb}{m}{it}
+
+% MathTime Blackboard Bold Dark (Grassetto, pieno)
+% \DeclareMathAlphabet{\mathmtbbd}{U}{mt2bb}{b}{n}
+
+% Altri pacchetti
+% \usepackage{thmtools}      % Per teoremi e dimostrazioni (alternativa ad amsthm)
+\usepackage{enumitem}       % Per personalizzare gli elenchi
+\usepackage{multirow}       % Per celle che si estendono su più righe
+\usepackage{relsize}        % Per cambiare la dimensione del testo in modo relativo
+% \usepackage[b]{esvect}      % Per vettori con freccia più elegante
+\usepackage{ifthen}         % PER I COMANDI CON LOGICA CONDIZIONALE
+\usepackage{tikz}           % Per disegni e grafici
+\usepackage{tikz-3dplot}    % Per grafici 3D con TikZ
+\usepackage{tikz-cd}        % Per diagrammi commutativi
+
+\usepackage{graphicx}       % Per includere immagini
+\graphicspath{{./images/}{../images/}} % Percorsi delle immagini
+
+\usepackage{fancyvrb}       % Per ambienti verbatim non standard
+\usepackage{fvextra}        % Estensioni per verbatim (es. \SaveVerb, \UseVerb)
+\usepackage[Glenn]{fncychap}% Per capitoli con stile personalizzato 
+%Options: Sonny, Lenny, Glenn, Conny, Rejne, Bjarne, Bjornstrup
+\usepackage{caption}        % Per personalizzare le didascalie
+%personalizza caption
+\captionsetup{font=small, % Dimensione del font
+              labelfont=bf, % Grassetto per l'etichetta
+              labelsep=period} % Separatore tra etichetta e testo
+\usepackage{siunitx}        % Per la formattazione di unità di misura
+% Configurazione di siunitx per separatore migliaia e unità di misura
+\sisetup{
+    output-decimal-marker={.}, % Separatore decimale
+    group-separator={\,},      % Separatore delle migliaia
+    group-minimum-digits=4,    % Inizia a separare le migliaia da 4 cifre in su (es. 1 000)
+    separate-uncertainty=true, % Stampa l'incertezza con il simbolo \pm
+    multi-part-units=brackets  % Mette le parentesi tonde quando c'è un'incertezza
+}
+
+\usepackage{geometry}       % Per gestire i margini
+\geometry{a4paper, margin=2.5cm}
+
+% setup intestazioni e piè di pagina
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{} % Pulisce tutti gli header e footer
+\setlength{\headwidth}{\textwidth} % Larghezza header uguale a textwidth/linewidth
+\fancyhead[LE,RO]{\thepage} % Numeri di pagina ai lati esterni
+\fancyhead[RE]{\nouppercase{\leftmark}} % Nome capitolo a sinistra nelle pagine pari
+\fancyhead[LO]{\nouppercase{\rightmark}} % Nome sezione a destra nelle pagine dispari
+\renewcommand{\headrulewidth}{0.4pt} % Linea sotto l'header
+\renewcommand{\footrulewidth}{0pt} % Nessuna linea nel footer
+
+% hyperref per link e riferimenti
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={Esercizi di Algebra Lineare},
+    pdfauthor={Davide De Marco},
+    pdfsubject={},
+    pdfkeywords={Algebra Lineare, matrici, spazi vettoriali, sistemi lineari, esercizi},
+}
+
+% Per approfondimenti o box di testo evidenziati
+\usepackage{tcolorbox}% Per creare box colorati (es. per teoremi, esempi, ecc.)
+\tcbuselibrary{breakable, skins} % Per box che possono andare su più pagine e con stili personalizzati
+
+% Definiamo uno stile globale per comodità
+\tcbset{
+    enhanced jigsaw,             % Skin raccomandata per box spezzati
+    colback=red!5!white,         % Colore di sfondo
+    colframe=red!75!black,       % Colore della cornice
+    fonttitle=\bfseries,         % Grassetto per il titolo
+    %watermark color=yellow!25!white, 
+    %watermark text=\arabic{tcbbreakpart} % Filigrana con il numero della parte
+}
+
+% Comando personalizzato per box di approfondimento con numerazione automatica
+\newtcolorbox[use counter*=section]{myBoxInsight}[2][]{
+    breakable,
+    enhanced jigsaw,
+    colback=black!5!white,
+    colframe=black!75!white,
+    fonttitle=\relsize{1}\bfseries,
+    title=\thetcbcounter~Approfondimento -- #2,
+    add to list={toc}{section}, % <--- Invia la voce al \tableofcontents
+    list text={Approfondimento -- #2},                % <--- Testo da mostrare nell'indice
+    leftrule=0pt,
+    rightrule=0pt,
+    sharp corners,
+    toptitle=3mm,    % <--- Aumenta lo spazio sopra il testo del titolo
+    bottomtitle=3mm, % <--- Aumenta lo spazio sotto il testo del titolo
+    phantom=\phantomsection, % <--- ANCORAGGIO PER I LINK
+    #1
+}
+
+% Comando intelligente per costanti matematiche
+\ExplSyntaxOn
+\NewDocumentCommand{\upconst}{m}
+ {
+  % Controlla se il numero di caratteri dell'input (#1) è esattamente 1
+  \int_compare:nNnTF { \str_count:n { #1 } } = { 1 }
+   { \mathrm { #1 } }    % [Vero] 1 carattere: applica \mathrm
+   { \use:c { up #1 } }  % [Falso] >1 caratteri: equivalente a \csname up#1\endcsname
+ }
+\ExplSyntaxOff
+
+% Costanti matematiche e versori
+\newcommand{\eu}{\upconst{e}}           % Costante di Nepero
+\newcommand{\iu}{\upconst{i}}           % Unità immaginaria
+\newcommand{\piu}{\upconst{pi}}               % Pi greco
+\newcommand{\vsi}{\bm{\mathbb{i}}}     % Versore asse x
+\newcommand{\vsj}{\bm{\mathbb{j}}}     % Versore asse y
+\newcommand{\vsk}{\bm{\mathbb{k}}}          % Versore asse z
+
+% --- Definizioni Matematiche Personalizzate ---
+\newcommand{\K}{\mathbbi{K}}             % Campo K
+
+% Operatori
+\DeclareMathOperator{\vers}{vers}       % Versore
+\DeclareMathOperator{\rk}{rk}           % Rango
+\DeclareMathOperator{\Sol}{Sol}         % Spazio delle Soluzioni
+\DeclareMathOperator{\GL}{GL}           % Gruppo Lineare Generale
+\DeclareMathOperator{\Imm}{im}          % Insieme immagine
+\DeclareMathOperator{\Span}{span}       % Span
+\newcommand{\Spanbis}{\mathscr{\altL}} % Span alternativo con L calligrafica
+\DeclareMathOperator{\Cof}{cof}         % Cofattore
+\DeclareMathOperator{\Adj}{adj}         % Matrice aggiunta (adjugate)
+\DeclareMathOperator{\trace}{tr}           % Traccia di una matrice
+\DeclareMathOperator{\sgn}{sgn}        % Funzione segno
+
+% simbolo per il lavoro
+\newcommand{\work}{\mathcal{W}}         % Lavoro con W calligrafico
+
+% Operatori differenziali
+\newcommand{\grad}{\nabla \mkern-1mu} % Gradiente con spazio negativo per avvicinarlo alla funzione
+\newcommand{\diverg}{\nabla \mkern-1.5mu \cdot \mkern-1.5mu}
+\newcommand{\rot}{\nabla \mkern-1.5mu \times \mkern-1.5mu}
+\newcommand{\lapl}{\nabla^2 \mkern-1mu} % Oppure \Delta
+\newcommand{\dalam}{\square} % Operatore d'Alembertiano
+
+% Matrici speciali
+\newcommand{\Id}{\bm{\mathbb{1}}}           % Matrice Identità (blackboard bold)
+
+\newcommand{\classC}[1]{\mathscr{\altC}^{#1}} % Classe C^k di funzioni
+
+% Spazio delle Matrici "Intelligente"
+% Sintassi: \Mat{righe}{colonne}{campo}
+\newcommand{\Mat}[3]{%
+    \ifthenelse{\equal{#1}{#2}}         % Controlla se righe=colonne
+        {\mathscr{M}_{#1}(#3)}          % Se righe=colonne
+        {\mathscr{M}_{#1,#2}(#3)}       % Se righe!=colonne
+}
+
+% Probabilità e statistica
+\newcommand{\prob}{\mathbbi{P}}         % Probabilità
+
+% Trasposta, Vettori e Matrici
+\newcommand{\vect}[1]{\bm{#1}}   % Vettore 
+\newcommand{\rvect}[1]{\vv{#1}} % Raggio vettore con freccia
+\newcommand{\tr}{^{\normalfont\textsf{\relsize{-1}T}}}               % Trasposta
+\newcommand{\compl}{^{\normalfont\textsf{\relsize{-1}C}}}
+\newcommand{\matr}[1]{\bm{#1}} % Matrice (grassetto)
+
+% Barra di separazione otticamente alleggerita per matrici a blocchi
+\newcommand{\middledivbar}{\;\color{black!46}\middle|\color{black}\;} % Per matrici a blocchi adattabile
+\newcommand{\bigdivbar}{\;\color{black!46}\big|\color{black}\;} % Per matrici a blocchi grandi
+\newcommand{\Bigdivbar}{\;\color{black!46}\Big|\color{black}\;} % Per matrici a blocchi ancora più grandi
+
+% --- NOTAZIONI MATRICIALI ---
+
+% Cofattore di una matrice (con i,j come indici)
+\newcommand{\cof}[3]{\Cof_{#1,#2}\mleft( #3 \mright)}
+
+% 1. Elemento di posto i,j (Opzionale: potresti anche scriverlo a mano essendo molto semplice)
+% Uso: \entry{A}{ij} oppure \entry{A}{i,j}
+% \newcommand{\entry}[2]{#1_{#2}}
+
+% 2. Riga di una matrice
+% Uso: \matrow{\matr{A}}{i}
+\newcommand{\matrow}[2]{{#1}_{(#2)}}
+
+% 3. Colonna di una matrice
+% Uso: \matcol{\matr{A}}{j}
+\newcommand{\matcol}[2]{{#1}^{(#2)}}
+% 4. Sottomatrice generale (estrazione di righe I e colonne J)
+% Uso: \submat{\matr{A}}{I}{J}
+% Uso: \submat{\matr{A}}{i_1,i_2,...,i_k}{j_1,j_2,...,j_l}
+\newcommand{\submat}[3]{{#1}_{(#2)}^{(#3)}}
+
+% 5. Sottomatrice con riga i e colonna j eliminate (taglio)
+% Uso: \subdel{\matr{A}}{i}{j}
+\newcommand{\subdel}[3]{{#1}_{(#2 \mid #3)}}
+
+\newcommand{\matrowsysm}[1]{\mathscr{R}_{#1}} % Simbolo per il sistema di righe di una matrice
+\newcommand{\matcolsysm}[1]{\mathscr{\altC}_{#1}} % Simbolo per il sistema di colonne di una matrice
+\newcommand{\req}{%
+    \overset{%
+      \text{%
+        \raisebox{-0.4ex}[1ex][0ex]{\relsize{-2}$\mathscr{R}$}%
+        }%
+        }{\equiv}} % Riga-equivalenza con R sopra
+
+% Insieme vuoto 
+% \renewcommand{\emptyset}{\varnothing}   % Simbolo di insieme vuoto più elegante
+
+\newcommand{\thmcita}[1]{\textsc{#1}} % Per citare teoremi con il nome in maiuscoletto
+
+
+% Definizione di un array per matrici a blocchi con linee grigie
+\newenvironment{blockarray}[1]
+  {%
+   \arrayrulecolor{black!46}% Colora le linee di grigio
+   \begin{array}{#1}%
+  }
+  {%
+   \end{array}%
+   \arrayrulecolor{black}% Ripristina il nero per non intaccare tabelle future
+  }
+
+% Comandi per le operazioni elementari sulle righe
+\newcounter{descrOP} % 1. Definisci il contatore
+
+\makeatletter
+\renewcommand{\p@descrOP}[1]{\normalfont OP\textsubscript{#1}}
+\makeatother
+
+% 2. Crea un comando personalizzato per l'item
+\newcommand{\itemOp}{%
+  \refstepcounter{descrOP}% Incrementa il contatore e permette a \label di vederlo
+  \item[(OP\textsubscript{\thedescrOP})]% Stampa il numero seguito dal testo dell'opzione
+}
+
+\newcounter{descrDet} % 1. Definisci il contatore
+
+\makeatletter
+\renewcommand{\p@descrDet}[1]{\normalfont D\textsubscript{#1}}
+\makeatother
+
+\newcommand{\itemDet}{%
+  \refstepcounter{descrDet}% Incrementa il contatore e permette a \label di vederlo
+  \item[(D\textsubscript{\thedescrDet})]% Stampa il numero seguito dal testo dell'opzione
+}
+
+% Simbolo di somma con grandezza adattabile al contesto (funziona male con TX)
+\makeatletter
+\newcommand{\bigplus}{%
+  \DOTSB\mathop{\mathpalette\mattos@bigplus\relax}\slimits@
+}
+\newcommand\mattos@bigplus[2]{%
+  \vcenter{\hbox{%
+    \sbox\z@{$#1\sum$}%
+    \resizebox{!}{0.9\dimexpr\ht\z@+\dp\z@}{\raisebox{\depth}{$\m@th#1+$}}%
+  }}%
+  \vphantom{\sum}%
+}
+\makeatother
+
+% simbolo di unione disgiunta con grandezza adattabile al contesto
+% Source - https://tex.stackexchange.com/a/52673
+% Posted by egreg, modified by community. See post 'Timeline' for change history
+% Retrieved 2026-09-22, License - CC BY-SA 4.0
+
+\makeatletter
+\def\moverlay{\mathpalette\mov@rlay}
+\def\mov@rlay#1#2{\leavevmode\vtop{%
+   \baselineskip\z@skip \lineskiplimit-\maxdimen
+   \ialign{\hfil$\m@th#1##$\hfil\cr#2\crcr}}}
+\newcommand{\charfusion}[3][\mathord]{
+    #1{\ifx#1\mathop\vphantom{#2}\fi
+        \mathpalette\mov@rlay{#2\cr#3}
+      }
+    \ifx#1\mathop\expandafter\displaylimits\fi}
+\makeatother
+
+\newcommand{\cupdot}{\charfusion[\mathbin]{\cup}{\cdot}}
+\newcommand{\bigcupdot}{\charfusion[\mathop]{\bigcup}{\cdot}}
+
+% Parentesi più grandi
+% Source - https://tex.stackexchange.com/a/387592
+% Posted by campa
+% Retrieved 2026-09-22, License - CC BY-SA 3.0
+
+\makeatletter
+\newcommand{\biggg}{\bBigg@\thr@@}
+\newcommand{\Biggg}{\bBigg@{3.5}}
+\def\bigggl{\mathopen\biggg}
+\def\bigggm{\mathrel\biggg}
+\def\bigggr{\mathclose\biggg}
+\def\Bigggl{\mathopen\Biggg}
+\def\Bigggm{\mathrel\Biggg}
+\def\Bigggr{\mathclose\Biggg}
+\makeatother
+
+
+% --- Ambienti Teorema ---
+\newtheoremstyle{normaltheorem}% Nome dello stile
+    {3pt}% Space above
+    {3pt}% Space below
+    {\itshape}% Body font
+    {}% Indent amount
+    {\bfseries\scshape}% Theorem head font
+    {.}% Punctuation after theorem head
+    {.5em}% Space after theorem head
+    {\thmname{#1}\thmnumber{ #2}\thmnote{ \normalfont\bfseries(#3)}}% Theorem head spec (can be left empty, meaning ‘normal’)
+\theoremstyle{normaltheorem} % Stile corsivo per i teoremi (default)
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollario}
+\newtheorem{proposition}[theorem]{Proposizione}
+
+\newtheoremstyle{nametheorem}% Nome dello stile
+    {3pt}% Space above
+    {3pt}% Space below
+    {\itshape}% Body font
+    {}% Indent amount
+    {\bfseries\scshape}% Theorem head font
+    {.}% Punctuation after theorem head
+    {.5em}% Space after theorem head
+    {\thmname{#1}\thmnote{ #3}\thmnumber{ #2}}% Theorem head spec (can be left empty, meaning ‘normal’)
+\theoremstyle{nametheorem}
+\newtheorem{nametheorem}[theorem]{Teorema}
+\newtheorem{namelemma}[theorem]{Lemma}
+
+\makeatletter
+\renewenvironment{proof}[1][\proofname]{\par
+  \pushQED{\qed}%
+  \normalfont \topsep6\p@\@plus6\p@\relax
+  \trivlist
+  \item\relax
+  {\scshape
+    #1\@addpunct{.}}\hspace\labelsep\ignorespaces
+  }{%
+    \popQED\endtrivlist\@endpefalse
+  }
+\makeatother
+
+%\theoremstyle{definition} % Stile tondo per le definizioni
+%\newtheorem*{definizione}{\normalfont\textsc{Definizione}}%[section]
+\newtheoremstyle{definition_style}% Nome dello stile
+    {3pt}% Space above
+    {3pt}% Space below
+    {}% Body font
+    {}% Indent amount
+    {\bfseries\scshape}% Theorem head font
+    {.}% Punctuation after theorem head
+    {.5em}% Space after theorem head
+    {}% Theorem head spec (can be left empty, meaning ‘normal’)
+\theoremstyle{definition_style}
+\newtheorem{definition}{Definizione}[section]
+\newtheorem{axiom}{Assioma}
+
+\newtheoremstyle{notation_style}% Nome dello stile
+    {3pt}% Space above
+    {3pt}% Space below
+    {}% Body font
+    {}% Indent amount
+    {\bfseries\scshape}% Theorem head font
+    {.}% Punctuation after theorem head
+    {.5em}% Space after theorem head
+    {}% Theorem head spec (can be left empty, meaning ‘normal’)
+\theoremstyle{notation_style}
+\newtheorem{notation}[definition]{Notazione}
+
+\newtheoremstyle{example_style}% Nome dello stile
+    {3pt}% Space above
+    {3pt}% Space below
+    {}% Body font
+    {}% Indent amount
+    {\bfseries\scshape}% Theorem head font
+    {.}% Punctuation after theorem head
+    {.5em}% Space after theorem head
+    {}% Theorem head spec (can be left empty, meaning ‘normal’)
+\theoremstyle{example_style}
+\newtheorem{example}{Esempio}[section]
+
+
+\theoremstyle{remark} % Stile per le osservazioni
+\newtheorem*{remark}{Osservazione}%[section]
+\newtheorem*{property}{Proprietà}%[section]
+
+%\setlist[description]{font=\normalfont\itshape, style=nextline}
